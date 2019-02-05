@@ -1,15 +1,27 @@
-﻿{
-  "name": "MsBotv4",
-  "services": [
-    {
-      "type": "endpoint",
-      "name": "development",
-      "endpoint": "http://localhost:3978/api/messages",
-      "appId": "",
-      "appPassword": "",
-      "id": "1"
-    }
-  ],
-  "padlock": "",
-  "version": "2.0"
+{
+    "name": "MsBotv4",
+    "description": "",
+    "services": [
+        {
+            "type": "endpoint",
+            "name": "development",
+            "endpoint": "http://localhost:3978/api/messages",
+            "appId": "",
+            "appPassword": "",
+            "id": "1"
+        },
+        {
+            "type": "blob",
+            "name": "BlobDataStore",
+            "serviceName": "julietinsurancebot950a",
+            "tenantId": "apavate@miraclesoft07.onmicrosoft.com",
+            "subscriptionId": "b19669be-bfa2-4e86-b7d4-f1b4d98dd2a5",
+            "resourceGroup": "TBD",
+            "connectionString": "DefaultEndpointsProtocol=https;AccountName=julietinsurancebot950a;AccountKey=7PybacjW0kYXskkR1zW4NRgXDaWkpfl7ZVSDuGQiWck/5f47qpg1CZemioWjI06c/r0g/YIbr1FRUdZDDA8/9Q==;EndpointSuffix=core.windows.net",
+            "container": "msbotv4",
+            "id": "140"
+        }
+    ],
+    "padlock": "",
+    "version": "2.0"
 }
