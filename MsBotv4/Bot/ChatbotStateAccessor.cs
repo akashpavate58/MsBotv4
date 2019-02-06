@@ -11,7 +11,7 @@ namespace MsBotv4.Bot
     {
         public ConversationState ConversationState { get; }
         public IStatePropertyAccessor<ChatbotState> ChatbotStateProperty { get; set; }
-        public static string ChatbotStateName { get; } = $"{nameof(ChatbotStateAccessor)}.ChatbotState";
+        public static string ChatbotStateName { get; } = $"{nameof(ChatbotStateAccessor)}.ChatbotStateProperty";
 
         public ChatbotStateAccessor(ConversationState conversationState)
         {
