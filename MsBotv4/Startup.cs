@@ -60,12 +60,13 @@ namespace MsBotv4
                var secretKey = Configuration.GetSection("botFileSecret")?.Value;
                var botFilePath = Configuration.GetSection("botFilePath")?.Value;
 
-                // Loads .bot configuration file and adds a singleton that your Bot can access through dependency injection.
-                var botConfig = BotConfiguration.Load(botFilePath ?? @".\MsBotv4.bot", secretKey);
+               // Refer botbuider-tools - MSBot - https://github.com/Microsoft/botbuilder-tools/tree/master/packages/MSBot/docs
+               // Loads .bot configuration file and adds a singleton that your Bot can access through dependency injection.
+               var botConfig = BotConfiguration.Load(botFilePath ?? @".\MsBotv4.bot", secretKey);
                services.AddSingleton(sp => botConfig ?? throw new InvalidOperationException($"The .bot config file could not be loaded. ({botConfig})"));
 
                 // Retrieve current endpoint.
-                var environment = _isProduction ? "production" : "development";
+               var environment = _isProduction ? "production" : "development";
                var service = botConfig.Services.FirstOrDefault(s => s.Type == "endpoint" && s.Name == environment);
                if (!(service is EndpointService endpointService))
                {
