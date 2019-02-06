@@ -1,27 +1,15 @@
-{
-    "name": "MsBotv4",
-    "description": "",
-    "services": [
-        {
-            "type": "endpoint",
-            "name": "development",
-            "endpoint": "http://localhost:3978/api/messages",
-            "appId": "",
-            "appPassword": "",
-            "id": "1"
-        },
-        {
-            "type": "blob",
-            "name": "BlobDataStore",
-            "serviceName": "<storageAccountName>",
-            "tenantId": "<xyz@mircosoft.com>",
-            "subscriptionId": "<subscriptionId>",
-            "resourceGroup": "<resourceGroup>",
-            "connectionString": "<connectionString>",
-            "container": "<container>",
-            "id": "140"
-        }
-    ],
-    "padlock": "",
-    "version": "2.0"
+﻿{
+  "name": "MsBotv4",
+  "services": [
+    {
+      "type": "endpoint",
+      "name": "development",
+      "endpoint": "http://localhost:3978/api/messages",
+      "appId": "",
+      "appPassword": "",
+      "id": "1"
+    }
+  ],
+  "padlock": "",
+  "version": "2.0"
 }
