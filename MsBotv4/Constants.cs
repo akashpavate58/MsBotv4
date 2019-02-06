@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 
 namespace MsBotv4
 {
-    public static class Constants
+    public class Constants
     {
+        public static readonly string SupportedLanguage = "en";
     }
 }

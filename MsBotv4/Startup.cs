@@ -55,7 +55,7 @@ namespace MsBotv4
         /// <seealso cref="https://docs.microsoft.com/en-us/azure/bot-service/bot-service-manage-channels?view=azure-bot-service-4.0"/>
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddBot<Chatbot>(options =>
+           services.AddBot<Chatbot>(options =>
            {
                var secretKey = Configuration.GetSection("botFileSecret")?.Value;
                var botFilePath = Configuration.GetSection("botFilePath")?.Value;
@@ -65,7 +65,7 @@ namespace MsBotv4
                var botConfig = BotConfiguration.Load(botFilePath ?? @".\MsBotv4.bot", secretKey);
                services.AddSingleton(sp => botConfig ?? throw new InvalidOperationException($"The .bot config file could not be loaded. ({botConfig})"));
 
-                // Retrieve current endpoint.
+               // Retrieve current endpoint.
                var environment = _isProduction ? "production" : "development";
                var service = botConfig.Services.FirstOrDefault(s => s.Type == "endpoint" && s.Name == environment);
                if (!(service is EndpointService endpointService))
@@ -75,11 +75,11 @@ namespace MsBotv4
 
                options.CredentialProvider = new SimpleCredentialProvider(endpointService.AppId, endpointService.AppPassword);
 
-                // Creates a logger for the application to use.
-                ILogger logger = _loggerFactory.CreateLogger<Chatbot>();
+               // Creates a logger for the application to use.
+               ILogger logger = _loggerFactory.CreateLogger<Chatbot>();
 
-                // Catches any errors that occur during a conversation turn and logs them.
-                options.OnTurnError = async (context, exception) =>
+               // Catches any errors that occur during a conversation turn and logs them.
+               options.OnTurnError = async (context, exception) =>
                {
                    logger.LogError($"Exception caught : {exception}");
                    await context.SendActivityAsync("Sorry, it looks like something went wrong.");
@@ -115,9 +115,9 @@ namespace MsBotv4
                options.State.Add(conversationState);
            });
 
-            // Create and register state accessors.
-            // Accessors created here are passed into the IBot-derived class on every turn.
-            services.AddSingleton<ChatbotStateAccessor>(sp =>
+           // Create and register state accessors.
+           // Accessors created here are passed into the IBot-derived class on every turn.
+           services.AddSingleton<ChatbotStateAccessor>(sp =>
            {
                var options = sp.GetRequiredService<IOptions<BotFrameworkOptions>>().Value;
                if (options == null)
