@@ -117,10 +117,13 @@ namespace MsBotv4
                 options.State.Add(conversationState);
                 options.State.Add(userState);
 
-                var translatorKey = Configuration.GetValue<string>("msTranslatorKey");
-                options.Middleware.Add(
-                    new TranslationMiddleware(new MicrosoftTranslator(translatorKey),
-                    ChatbotStateAccessor.Create(conversationState, userState)));
+                if(Configuration.GetValue<bool>("isTranslationMiddlewareEnabled"))
+                {
+                    var translatorKey = Configuration.GetValue<string>("msTranslatorKey");
+                    options.Middleware.Add(
+                        new TranslationMiddleware(new MicrosoftTranslator(translatorKey),
+                        ChatbotStateAccessor.Create(conversationState, userState)));
+                }
             });
 
             // Create and register state accessors.

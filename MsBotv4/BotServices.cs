@@ -12,7 +12,7 @@ namespace MsBotv4
     {
         public Dictionary<string, LuisRecognizer> LuisServices { get; } = new Dictionary<string, LuisRecognizer>();
         public Dictionary<string, QnAMaker> QnaServices { get; } = new Dictionary<string, QnAMaker>();
-        
+
 
         public BotServices(BotConfiguration botConfiguration)
         {
