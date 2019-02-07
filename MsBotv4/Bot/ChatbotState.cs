@@ -8,9 +8,11 @@ namespace MsBotv4.Bot
     public class ChatbotState
     {
         public string NameOfTheUser { get; set; }
+        public string SpokenLanguage { get; set; }
 
         public static ChatbotState Default => new ChatbotState {
-            NameOfTheUser = ""
+            NameOfTheUser = "",
+            SpokenLanguage = Constants.DefaultLanguage
         };
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,15 +14,18 @@ namespace MsBotv4.Bot
         public UserState UserState { get; }
         public IStatePropertyAccessor<ChatbotState> ChatbotStateProperty { get; set; }
         public IStatePropertyAccessor<ChatUserState> ChatUserStateProperty { get; set; }
+        public IStatePropertyAccessor<DialogState> ConversationDialogState { get; set; }
         public static string ChatbotStateName { get; } = $"{nameof(ChatbotStateAccessor)}.ChatbotStateProperty";
         public static string ChatUserStateName { get; } = $"{nameof(ChatbotStateAccessor)}.ChatUserStateProperty";
+        public static string ConversationDialogStateName { get; } = $"{nameof(ChatbotStateAccessor)}.ConversationDialogState";
         //=================================================================================================================================
         public static ChatbotStateAccessor Create(ConversationState conversationState, UserState userState)
         {
             return new ChatbotStateAccessor(conversationState, userState)
             {
                 ChatbotStateProperty = conversationState.CreateProperty<ChatbotState>(ChatbotStateAccessor.ChatbotStateName),
-                ChatUserStateProperty = userState.CreateProperty<ChatUserState>(ChatbotStateAccessor.ChatUserStateName)
+                ChatUserStateProperty = userState.CreateProperty<ChatUserState>(ChatbotStateAccessor.ChatUserStateName),
+                ConversationDialogState = conversationState.CreateProperty<DialogState>(ChatbotStateAccessor.ConversationDialogStateName)
             };
         }
         //=================================================================================================================================

@@ -15,6 +15,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MsBotv4.Bot;
+using MsBotv4.Middleware;
+using MsBotv4.Services.Translation;
 
 namespace MsBotv4
 {
@@ -55,94 +57,99 @@ namespace MsBotv4
         /// <seealso cref="https://docs.microsoft.com/en-us/azure/bot-service/bot-service-manage-channels?view=azure-bot-service-4.0"/>
         public void ConfigureServices(IServiceCollection services)
         {
-           services.AddBot<Chatbot>(options =>
-           {
-               var secretKey = Configuration.GetSection("botFileSecret")?.Value;
-               var botFilePath = Configuration.GetSection("botFilePath")?.Value;
+            services.AddBot<Chatbot>(options =>
+            {
+                var secretKey = Configuration.GetSection("botFileSecret")?.Value;
+                var botFilePath = Configuration.GetSection("botFilePath")?.Value;
 
-               // Refer botbuider-tools - MSBot - https://github.com/Microsoft/botbuilder-tools/tree/master/packages/MSBot/docs
-               // Loads .bot configuration file and adds a singleton that your Bot can access through dependency injection.
-               var botConfig = BotConfiguration.Load(botFilePath ?? @".\MsBotv4.bot", secretKey);
-               services.AddSingleton(sp => botConfig ?? throw new InvalidOperationException($"The .bot config file could not be loaded. ({botConfig})"));
+                // Refer botbuider-tools - MSBot - https://github.com/Microsoft/botbuilder-tools/tree/master/packages/MSBot/docs
+                // Loads .bot configuration file and adds a singleton that your Bot can access through dependency injection.
+                var botConfig = BotConfiguration.Load(botFilePath ?? @".\MsBotv4.bot", secretKey);
+                services.AddSingleton(sp => botConfig ?? throw new InvalidOperationException($"The .bot config file could not be loaded. ({botConfig})"));
 
-               // Retrieve current endpoint.
-               var environment = _isProduction ? "production" : "development";
-               var service = botConfig.Services.FirstOrDefault(s => s.Type == "endpoint" && s.Name == environment);
-               if (!(service is EndpointService endpointService))
-               {
-                   throw new InvalidOperationException($"The .bot file does not contain an endpoint with name '{environment}'.");
-               }
+                // Retrieve current endpoint.
+                var environment = _isProduction ? "production" : "development";
+                var service = botConfig.Services.FirstOrDefault(s => s.Type == "endpoint" && s.Name == environment);
+                if (!(service is EndpointService endpointService))
+                {
+                    throw new InvalidOperationException($"The .bot file does not contain an endpoint with name '{environment}'.");
+                }
 
-               options.CredentialProvider = new SimpleCredentialProvider(endpointService.AppId, endpointService.AppPassword);
+                options.CredentialProvider = new SimpleCredentialProvider(endpointService.AppId, endpointService.AppPassword);
 
-               // Creates a logger for the application to use.
-               ILogger logger = _loggerFactory.CreateLogger<Chatbot>();
+                // Creates a logger for the application to use.
+                ILogger logger = _loggerFactory.CreateLogger<Chatbot>();
 
-               // Catches any errors that occur during a conversation turn and logs them.
-               options.OnTurnError = async (context, exception) =>
-               {
-                   logger.LogError($"Exception caught : {exception}");
-                   await context.SendActivityAsync("Sorry, it looks like something went wrong.");
-               };
+                // Catches any errors that occur during a conversation turn and logs them.
+                options.OnTurnError = async (context, exception) =>
+                 {
+                     logger.LogError($"Exception caught : {exception}");
+                     await context.SendActivityAsync("Sorry, it looks like something went wrong.");
+                 };
 
-               // The Memory Storage used here is for local bot debugging only. When the bot
-               // is restarted, everything stored in memory will be gone.
-               //IStorage dataStore = new MemoryStorage();
-               
-               // For production bots use the Azure Blob or
-               // Azure CosmosDB storage providers. For the Azure
-               // based storage providers, add the Microsoft.Bot.Builder.Azure
-               // Nuget package to your solution. That package is found at:
-               // https://www.nuget.org/packages/Microsoft.Bot.Builder.Azure/
-               // Uncomment the following lines to use Azure Blob Storage
-               //Storage configuration name or ID from the .bot file.
-               const string StorageConfigurationId = "BlobDataStore";
-               var blobConfig = botConfig.FindServiceByNameOrId(StorageConfigurationId);
-               if (!(blobConfig is BlobStorageService blobStorageConfig))
-               {
-                   throw new InvalidOperationException($"The .bot file does not contain an blob storage with name '{StorageConfigurationId}'.");
-               }
-               // Default container name.
-               const string DefaultBotContainer = "default";
-               var storageContainer = string.IsNullOrWhiteSpace(blobStorageConfig.Container) ? DefaultBotContainer : blobStorageConfig.Container;
-               IStorage dataStore = new Microsoft.Bot.Builder.Azure.AzureBlobStorage(blobStorageConfig.ConnectionString, storageContainer);
-               
+                // The Memory Storage used here is for local bot debugging only. When the bot
+                // is restarted, everything stored in memory will be gone.
+                //IStorage dataStore = new MemoryStorage();
 
-               // Create Conversation State object.
-               // The Conversation State object is where we persist anything at the conversation-scope.
-               var conversationState = new ConversationState(dataStore);
-               var userState = new UserState(dataStore);
-               options.State.Add(conversationState);
-               options.State.Add(userState);
-           });
+                // For production bots use the Azure Blob or
+                // Azure CosmosDB storage providers. For the Azure
+                // based storage providers, add the Microsoft.Bot.Builder.Azure
+                // Nuget package to your solution. That package is found at:
+                // https://www.nuget.org/packages/Microsoft.Bot.Builder.Azure/
+                // Uncomment the following lines to use Azure Blob Storage
+                //Storage configuration name or ID from the .bot file.
+                const string StorageConfigurationId = "BlobDataStore";
+                var blobConfig = botConfig.FindServiceByNameOrId(StorageConfigurationId);
+                if (!(blobConfig is BlobStorageService blobStorageConfig))
+                {
+                    throw new InvalidOperationException($"The .bot file does not contain an blob storage with name '{StorageConfigurationId}'.");
+                }
+                // Default container name.
+                const string DefaultBotContainer = "default";
+                var storageContainer = string.IsNullOrWhiteSpace(blobStorageConfig.Container) ? DefaultBotContainer : blobStorageConfig.Container;
+                IStorage dataStore = new Microsoft.Bot.Builder.Azure.AzureBlobStorage(blobStorageConfig.ConnectionString, storageContainer);
 
-           // Create and register state accessors.
-           // Accessors created here are passed into the IBot-derived class on every turn.
-           services.AddSingleton<ChatbotStateAccessor>(sp =>
-           {
-               var options = sp.GetRequiredService<IOptions<BotFrameworkOptions>>().Value;
-               if (options == null)
-               {
-                   throw new InvalidOperationException("BotFrameworkOptions must be configured prior to setting up the state accessors");
-               }
 
-               var conversationState = options.State.OfType<ConversationState>().FirstOrDefault();
-               if (conversationState == null)
-               {
-                   throw new InvalidOperationException("ConversationState must be defined and added before adding conversation-scoped state accessors.");
-               }
+                // Create Conversation State object.
+                // The Conversation State object is where we persist anything at the conversation-scope.
+                var conversationState = new ConversationState(dataStore);
+                var userState = new UserState(dataStore);
+                options.State.Add(conversationState);
+                options.State.Add(userState);
 
-               var userState = options.State.OfType<UserState>().FirstOrDefault();
-               if (userState == null)
-               {
-                   throw new InvalidOperationException("UserState must be defined and added before adding user-scoped state accessors.");
-               }
-               // Create the custom state accessor.
-               // State accessors enable other components to read and write individual properties of state.
-               var accessors = ChatbotStateAccessor.Create(conversationState, userState);
-               
-               return accessors;
-           });
+                var translatorKey = Configuration.GetValue<string>("msTranslatorKey");
+                options.Middleware.Add(
+                    new TranslationMiddleware(new MicrosoftTranslator(translatorKey),
+                    ChatbotStateAccessor.Create(conversationState, userState)));
+            });
+
+            // Create and register state accessors.
+            // Accessors created here are passed into the IBot-derived class on every turn.
+            services.AddSingleton<ChatbotStateAccessor>(sp =>
+            {
+                var options = sp.GetRequiredService<IOptions<BotFrameworkOptions>>().Value;
+                if (options == null)
+                {
+                    throw new InvalidOperationException("BotFrameworkOptions must be configured prior to setting up the state accessors");
+                }
+
+                var conversationState = options.State.OfType<ConversationState>().FirstOrDefault();
+                if (conversationState == null)
+                {
+                    throw new InvalidOperationException("ConversationState must be defined and added before adding conversation-scoped state accessors.");
+                }
+
+                var userState = options.State.OfType<UserState>().FirstOrDefault();
+                if (userState == null)
+                {
+                    throw new InvalidOperationException("UserState must be defined and added before adding user-scoped state accessors.");
+                }
+                // Create the custom state accessor.
+                // State accessors enable other components to read and write individual properties of state.
+                var accessors = ChatbotStateAccessor.Create(conversationState, userState);
+
+                return accessors;
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)

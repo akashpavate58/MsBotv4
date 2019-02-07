@@ -7,6 +7,6 @@ namespace MsBotv4
 {
     public class Constants
     {
-        public static readonly string SupportedLanguage = "en";
+        public static readonly string DefaultLanguage = "en";
     }
 }
