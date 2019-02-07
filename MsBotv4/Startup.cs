@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using Bot.Builder.Community.Middleware.SpellCheck;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Bot.Builder;
@@ -57,6 +58,7 @@ namespace MsBotv4
         /// <seealso cref="https://docs.microsoft.com/en-us/azure/bot-service/bot-service-manage-channels?view=azure-bot-service-4.0"/>
         public void ConfigureServices(IServiceCollection services)
         {
+            //BotBuilderCommunity OpenSource - https://github.com/BotBuilderCommunity/botbuilder-community-dotnet
             services.AddBot<Chatbot>(options =>
             {
                 var secretKey = Configuration.GetSection("botFileSecret")?.Value;
@@ -124,6 +126,13 @@ namespace MsBotv4
                         new TranslationMiddleware(new MicrosoftTranslator(translatorKey),
                         ChatbotStateAccessor.Create(conversationState, userState)));
                 }
+
+                //https://github.com/BotBuilderCommunity/botbuilder-community-dotnet/tree/master/libraries/Bot.Builder.Community.Middleware.SpellCheck
+                if (Configuration.GetValue<bool>("isSpellCheckEnabled"))
+                {
+                    options.Middleware.Add(new SpellCheckMiddleware(Configuration)); 
+                }
+
             });
 
             // Create and register state accessors.
