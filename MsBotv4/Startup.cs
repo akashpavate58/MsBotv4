@@ -88,7 +88,7 @@ namespace MsBotv4
                // The Memory Storage used here is for local bot debugging only. When the bot
                // is restarted, everything stored in memory will be gone.
                //IStorage dataStore = new MemoryStorage();
-
+               
                // For production bots use the Azure Blob or
                // Azure CosmosDB storage providers. For the Azure
                // based storage providers, add the Microsoft.Bot.Builder.Azure
@@ -111,8 +111,9 @@ namespace MsBotv4
                // Create Conversation State object.
                // The Conversation State object is where we persist anything at the conversation-scope.
                var conversationState = new ConversationState(dataStore);
-
+               var userState = new UserState(dataStore);
                options.State.Add(conversationState);
+               options.State.Add(userState);
            });
 
            // Create and register state accessors.
@@ -131,13 +132,15 @@ namespace MsBotv4
                    throw new InvalidOperationException("ConversationState must be defined and added before adding conversation-scoped state accessors.");
                }
 
+               var userState = options.State.OfType<UserState>().FirstOrDefault();
+               if (userState == null)
+               {
+                   throw new InvalidOperationException("UserState must be defined and added before adding user-scoped state accessors.");
+               }
                // Create the custom state accessor.
                // State accessors enable other components to read and write individual properties of state.
-               var accessors = new ChatbotStateAccessor(conversationState)
-               {
-                    ChatbotStateProperty = conversationState.CreateProperty<ChatbotState>(ChatbotStateAccessor.ChatbotStateName),
-               };
-
+               var accessors = ChatbotStateAccessor.Create(conversationState, userState);
+               
                return accessors;
            });
         }
