@@ -8,5 +8,7 @@ namespace MsBotv4
     public class Constants
     {
         public static readonly string DefaultLanguage = "en";
+
+        public static readonly string LuisKey = "luisModel";
     }
 }

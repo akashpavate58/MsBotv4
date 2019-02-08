@@ -58,17 +58,23 @@ namespace MsBotv4
         /// <seealso cref="https://docs.microsoft.com/en-us/azure/bot-service/bot-service-manage-channels?view=azure-bot-service-4.0"/>
         public void ConfigureServices(IServiceCollection services)
         {
+            var secretKey = Configuration.GetSection("botFileSecret")?.Value;
+            var botFilePath = Configuration.GetSection("botFilePath")?.Value;
+
+            // Refer botbuider-tools - MSBot - https://github.com/Microsoft/botbuilder-tools/tree/master/packages/MSBot/docs
+            // Loads .bot configuration file and adds a singleton that your Bot can access through dependency injection.
+            var botConfig = BotConfiguration.Load(botFilePath ?? @".\MsBotv4.bot", secretKey);
+            services.AddSingleton(sp => botConfig ?? throw new InvalidOperationException($"The .bot config file could not be loaded. ({botConfig})"));
+
+            // Initialize Bot Connected Services clients.
+            var connectedServices = new BotServices(botConfig);
+            services.AddSingleton(sp => connectedServices);
+
+            services.AddSingleton(sp => botConfig);
+
             //BotBuilderCommunity OpenSource - https://github.com/BotBuilderCommunity/botbuilder-community-dotnet
             services.AddBot<Chatbot>(options =>
             {
-                var secretKey = Configuration.GetSection("botFileSecret")?.Value;
-                var botFilePath = Configuration.GetSection("botFilePath")?.Value;
-
-                // Refer botbuider-tools - MSBot - https://github.com/Microsoft/botbuilder-tools/tree/master/packages/MSBot/docs
-                // Loads .bot configuration file and adds a singleton that your Bot can access through dependency injection.
-                var botConfig = BotConfiguration.Load(botFilePath ?? @".\MsBotv4.bot", secretKey);
-                services.AddSingleton(sp => botConfig ?? throw new InvalidOperationException($"The .bot config file could not be loaded. ({botConfig})"));
-
                 // Retrieve current endpoint.
                 var environment = _isProduction ? "production" : "development";
                 var service = botConfig.Services.FirstOrDefault(s => s.Type == "endpoint" && s.Name == environment);

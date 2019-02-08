@@ -1,27 +1,46 @@
 {
-    "name": "MsBotv4",
-    "description": "",
-    "services": [
-        {
-            "type": "endpoint",
-            "name": "development",
-            "endpoint": "http://localhost:3978/api/messages",
-            "appId": "",
-            "appPassword": "",
-            "id": "1"
-        },
-        {
-            "type": "blob",
-            "name": "BlobDataStore",
-            "serviceName": "julietinsurancebot950a",
-            "tenantId": "apavate@miraclesoft07.onmicrosoft.com",
-            "subscriptionId": "b19669be-bfa2-4e86-b7d4-f1b4d98dd2a5",
-            "resourceGroup": "TBD",
-            "connectionString": "DefaultEndpointsProtocol=https;AccountName=julietinsurancebot950a;AccountKey=7PybacjW0kYXskkR1zW4NRgXDaWkpfl7ZVSDuGQiWck/5f47qpg1CZemioWjI06c/r0g/YIbr1FRUdZDDA8/9Q==;EndpointSuffix=core.windows.net",
-            "container": "msbotv4",
-            "id": "140"
-        }
-    ],
-    "padlock": "",
-    "version": "2.0"
+  "name": "MsBotv4",
+  "description": "",
+  "services": [
+    {
+      "type": "endpoint",
+      "name": "development",
+      "endpoint": "http://localhost:3978/api/messages",
+      "appId": "",
+      "appPassword": "",
+      "id": "1"
+    },
+    {
+      "type": "blob",
+      "name": "BlobDataStore",
+      "serviceName": "julietinsurancebot950a",
+      "tenantId": "apavate@miraclesoft07.onmicrosoft.com",
+      "subscriptionId": "b19669be-bfa2-4e86-b7d4-f1b4d98dd2a5",
+      "resourceGroup": "TBD",
+      "connectionString": "DefaultEndpointsProtocol=https;AccountName=julietinsurancebot950a;AccountKey=7PybacjW0kYXskkR1zW4NRgXDaWkpfl7ZVSDuGQiWck/5f47qpg1CZemioWjI06c/r0g/YIbr1FRUdZDDA8/9Q==;EndpointSuffix=core.windows.net",
+      "container": "msbotv4",
+      "id": "140"
+    },
+    {
+      "type": "luis",
+      "name": "luisModel",
+      "appId": "5f7a374b-eb1c-427b-a42a-03763ee87d58",
+      "authoringKey": "88c4549ad706421b904f8479aa7b5654",
+      "subscriptionKey": "88c4549ad706421b904f8479aa7b5654",
+      "version": "0.1",
+      "region": "westus",
+      "id": "34"
+    },
+    {
+      "type": "generic",
+      "name": "MSTranslatorTextAPI",
+      "url": "https://uksouth.api.cognitive.microsoft.com/face/v1.0",
+      "configuration": {
+        "key": "xXOpE4UKJ0aCmVTNk989qQ==!R5ouZHhJSzA0XDiq9YzSARdx5+0k/Yxyihi3+dWYPy4UXh1xiL4M6ZuumSYt9fi9"
+      },
+      "id": "179"
+    }
+  ],
+  "padlock": "",
+  "version": "2.0"
 }
