@@ -81,6 +81,7 @@ namespace MsBotv4.Bot
         public async Task HandleActionsAsync(ITurnContext turnContext, CancellationToken cancellationToken = default(CancellationToken))
         {
             return;
+
         }
     }
 }
